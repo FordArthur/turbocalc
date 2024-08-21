@@ -22,7 +22,7 @@ static inline int_fast8_t get_operator(char** stream_ptr) {
 
 int main(int argc, char *argv[]) {
   if (argc != 2) {
-    fprintf(stderr, "Usage: %s 'your math expression here'", argv[0]);
+    fprintf(stderr, "Usage: %s 'your math expression here'\n", argv[0]);
     return 1;
   }
   
