@@ -6,7 +6,7 @@ static const char symbols[] = "+*";
 
 int main(int argc, char *argv[]) {
   if (argc != 3) {
-    fprintf(stderr, "Usage: %s number-of-calculations max-number", argv[0]);
+    fprintf(stderr, "Usage: %s number-of-calculations max-number\n", argv[0]);
     return 1;
   }
   int expr_length = 2*atoi(argv[1])-1;

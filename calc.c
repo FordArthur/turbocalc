@@ -4,7 +4,7 @@
 
 static int_fast8_t precedence_table[127] = { 
   ['+'] = 0, ['-'] = 0,
-  ['*'] = 1,
+  ['*'] = 1, ['/'] = 1
 };
 
 static inline int_fast32_t get_int(char** stream_ptr) {
@@ -25,47 +25,65 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Usage: %s 'your math expression here'\n", argv[0]);
     return 1;
   }
-  
-  int_fast32_t precs[2] = { [0] = 0, [1] = 1 };
-  int_fast32_t accum = get_int(argv + 1);
+
+  double precs[2] = { [0] = 0.0, [1] = 1.0 };
+  double accum = (double) get_int(argv + 1);
   int_fast8_t precedence;
-  int_fast8_t highest_inserted_precedence = 0;
+  int_fast8_t highest_precedence_operator;
+  int_fast8_t highest_inserted_precedence = -1;
 
   while (argv[1][0]) {
     int_fast8_t operator = get_operator(argv + 1);
     precedence = precedence_table[operator];
-    if (highest_inserted_precedence < precedence)
+    if (highest_inserted_precedence < precedence) {
+      highest_precedence_operator = operator;
       highest_inserted_precedence = precedence;
+    }
 
-    switch (highest_inserted_precedence) {
-      case 0:
+    switch (highest_precedence_operator) {
+      case '+':
         precs[0] += accum;
         break;
-      case 1:
+      case '-':
+        precs[0] -= accum;
+        break;
+      case '*':
         precs[1] *= accum;
+        break;
+      case '/':
+        precs[1] /= accum;
         break;
     }
     if (highest_inserted_precedence > precedence) {
       highest_inserted_precedence = precedence;
+      highest_precedence_operator = operator;
       precs[0] += precs[1];
       precs[1] = 1;
+    } else if (highest_inserted_precedence == precedence) {
+      highest_inserted_precedence = precedence;
+      highest_precedence_operator = operator;
     }
-    accum = get_int(argv + 1);
+    accum = (double) get_int(argv + 1);
   }
 
-  switch (precedence) {
-    case 0:
+  switch (highest_precedence_operator) {
+    case '+':
       precs[0] += accum;
       break;
-    case 1:
+    case '-':
+      precs[0] -= accum;
+      break;
+    case '*':
       precs[1] *= accum;
+      precs[0] += precs[1];
+      break;
+    case '/':
+      precs[1] /= accum;
+      precs[0] += precs[1];
       break;
   }
-  switch (highest_inserted_precedence) {
-    case 1:
-      precs[0] += precs[1];
-  }
-  printf("%ld\n", precs[0]);
+
+  printf("%f\n", precs[0]);
 
   return 0;
 }
